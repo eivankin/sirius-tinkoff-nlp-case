@@ -56,6 +56,7 @@ async def get_bot_info(message: types.Message):
 
 @dp.message_handler(content_types=types.ContentType.TEXT)
 async def handle_message(message: types.Message):
+    await message.answer_chat_action("typing")
     user_message = message.text
     chat_id = message.chat.id
 
