@@ -1,0 +1,23 @@
+version: "3.9"
+services:
+    redis:
+        image: redis
+        volumes:
+            - ${DOCKER_PROJECT_PATH:-.}/redis_data:/data  # Сохраняем данные Redis для устойчивости к перезапускам
+
+    bot:
+        build: ./bot
+        command: python3 main.py
+        depends_on:
+            - redis
+            - model
+        environment:
+            - REDIS_URL=redis://redis
+            - MODEL_URL=http://model/v1/models/${MODEL_NAME}/predict
+            - BOT_API_TOKEN
+
+    model:
+        build: ./model
+        volumes:
+            - ${DOCKER_PROJECT_PATH:-.}/${MODEL_NAME}:/app/${MODEL_NAME}
+        command: pinfer main:service --backend-host 0.0.0.0 --backend-port 80 --mode backend
